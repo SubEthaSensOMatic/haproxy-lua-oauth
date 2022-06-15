@@ -211,6 +211,9 @@ local function jwtverify(txn)
   -- Set an HAProxy variable for each field in the token payload
   setVariablesFromPayload(txn, token.payloaddecoded)
 
+  -- Set Payload as variable
+  txn:set_var("txn.oauth.payload", token.payload)
+
   -- 2. Verify the signature algorithm is supported (HS256, HS512, RS256)
   if algorithmIsValid(token) == false then
       log("Algorithm not valid.")
