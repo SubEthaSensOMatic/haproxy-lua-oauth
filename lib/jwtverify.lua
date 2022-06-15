@@ -282,7 +282,7 @@ core.register_init(function()
   config.issuer = os.getenv("OAUTH_ISSUER")
   config.audience = os.getenv("OAUTH_AUDIENCE")
   config.validateExpiration = os.getenv("OAUTH_VALIDATE_EXPIRATION")
-  if config.validateExpiration then config.validateExpiration = true end
+  if config.validateExpiration == nil then config.validateExpiration = true end
   
   -- when using an RS256 signature
   local publicKeyPath = os.getenv("OAUTH_PUBKEY_PATH") 
