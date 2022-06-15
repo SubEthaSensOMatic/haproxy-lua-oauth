@@ -244,7 +244,7 @@ local function jwtverify(txn)
   end
 
   -- 4. Verify that the token is not expired
-  if config.validateExpiration == true then
+  if config.validateExpiration != "false" then
     if expirationIsValid(token) == false then
       log("Token is expired.")
       goto out
