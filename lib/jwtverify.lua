@@ -27,7 +27,8 @@ if not config then
       publicKey = nil,
       issuer = nil,
       audience = nil,
-      hmacSecret = nil
+      hmacSecret = nil,
+      validateExp = true
   }
 end
 
@@ -151,6 +152,10 @@ local function hs512SignatureIsValid(token, secret)
 end
 
 local function expirationIsValid(token)
+  if token.headerdecoded.exp == nil then
+    log("No 'exp' provided in JWT header.")
+    return false
+  end  
   return os.difftime(token.payloaddecoded.exp, core.now().sec) > 0
 end
 
@@ -239,9 +244,11 @@ local function jwtverify(txn)
   end
 
   -- 4. Verify that the token is not expired
-  if expirationIsValid(token) == false then
-    log("Token is expired.")
-    goto out
+  if config.validateExpiration == true then
+    if expirationIsValid(token) == false then
+      log("Token is expired.")
+      goto out
+    end
   end
 
   -- 5. Verify the issuer
@@ -274,6 +281,8 @@ end
 core.register_init(function()
   config.issuer = os.getenv("OAUTH_ISSUER")
   config.audience = os.getenv("OAUTH_AUDIENCE")
+  config.validateExpiration = os.getenv("OAUTH_VALIDATE_EXPIRATION")
+  if config.validateExpiration then config.validateExpiration = true end
   
   -- when using an RS256 signature
   local publicKeyPath = os.getenv("OAUTH_PUBKEY_PATH") 
